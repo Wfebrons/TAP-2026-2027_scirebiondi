@@ -1,0 +1,40 @@
+services:
+  elasticsearch:
+    image: elasticsearch:8.10.2
+    container_name: server_elastic
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false   # <--- AGGIUNGI QUESTA RIGA
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    container_name: server_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana-oss
+    container_name: server_grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_AUTH_JWT_CLOCK_SKEW_TOLERANCE=60s
+      - GF_AUTH_GENERIC_OAUTH_CLOCK_SKEW_TOLERANCE=60s
+      -	GF_USERS_AUTH_PROXY_CLOCK_SKEW_TOLERANCE=60s
+    volumes:
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+
+volumes:
+  es_data:
+  redis_data:
+  grafana_data:
